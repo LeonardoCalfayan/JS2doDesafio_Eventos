@@ -21,8 +21,9 @@ let arrayCarrito = [];
 //ELEMENTOS DEL DOM
 let divRubros = document.getElementById('divRubros')
 let mostrarRubros = document.getElementById('mostrarRubros')
-
 let divProductos = document.getElementById('divProductos')
+let mostrarCarrito = document.getElementById('mostrarCarrito')
+let divCarrito = document.getElementById('divCarrito')
 
 //CLASES
 class Rubro{
@@ -48,9 +49,6 @@ class Producto{
         this.subTotal = this.precio * this.cantidad;
     }
 }
-
-
-
 
 
 
@@ -81,6 +79,7 @@ const rubrosDisponibles = () => {
                 <div class="card" id="${nombreRubros.nombre}" style="width: 18rem;">
                     <div class="card-body">
                         <h5 class="card-title">${nombreRubros.nombre}</h5>
+
                         <button class="btn btn-secondary" id="${nombreRubros.nombre}">Mostrar Productos</button>
                     </div>
                 </div>
@@ -91,12 +90,8 @@ const rubrosDisponibles = () => {
             
                }
            }) 
-        
         }
-
-    })
-
-        
+    })        
 }
 
 const productosDisponibles = (rubroElegido) =>{
@@ -109,17 +104,20 @@ const productosDisponibles = (rubroElegido) =>{
                 <div class="card-body">
                     <h5 class="card-title">${productosDisponibles.nombre}</h5>
                     <p class="card-text">Precio: $${productosDisponibles.precio}</p>
-                    <button class="btn btn-secondary" id="${productosDisponibles.nombre}">Comprar</button>
+                    <input type="number" placeholder="cantidad"  id="cantidad${productosDisponibles.nombre}">
+                    <button class="btn btn-secondary" id="${productosDisponibles.nombre}">Agregar al Carrito</button>
                 </div>
             </div>
        `           
        divProductos.addEventListener('click',(e) =>{
-        if(e.target && e.target.id === productosDisponibles.nombre){
-           
-           console.log(e.target.id)
-            //productosDisponibles(nombreRubros.nombre)
-        
-           }
+            if(e.target && e.target.id === productosDisponibles.nombre){
+
+                let productoElegido = arregloProductosDisponibles.find((producto => producto.nombre === e.target.id))
+                productoElegido.cantidad = document.getElementById(`cantidad${productosDisponibles.nombre}`).value
+                productoElegido.subtotalProducto()
+                arrayCarrito.push(productoElegido)
+                console.log(productoElegido)
+            }
        }) 
     
     }
@@ -127,120 +125,45 @@ const productosDisponibles = (rubroElegido) =>{
 }
 
 
-
-// const productosDisponibles = (rubroElegido) =>{
-//     let arregloProductosDisponibles = (arrayProductos.filter((producto) => producto.rubro === rubroElegido.nombre))
-//     let productoID
-//     do{
-//         let mostrarProductos = "";
-//         for(let productosDisponibles of arregloProductosDisponibles){
-//             mostrarProductos += (productosDisponibles.id + " " + productosDisponibles.nombre + " $" + productosDisponibles.precio + " c/u\n")
-//         }
-        
-//     //    productoID = parseInt(prompt("Ingresá el número del producto que vas a elegir por favor:\n" + mostrarProductos))
-
-//     }while(isNaN(productoID) || productoID <= 0 || productoID > arregloProductosDisponibles.length)
-
-// //   return(arregloProductosDisponibles.find((producto => producto.id === productoID)))
-
-// }
-
-
-
-const solicitarCantidad = (productoElegido) => {    
-    
-    let cantidad;
-    do{
-  //      cantidad = parseInt(prompt("Ingresá la cantidad que vas a llevar por favor: (máximo 12 unidades)"));
-
-    }while(isNaN(cantidad) || cantidad < 1 || cantidad > 12)
-    
-    productoElegido.cantidad = cantidad;
-    productoElegido.subtotalProducto();
-
-    arrayCarrito.push(productoElegido);
-
-}
-
 const informarCompra = () =>{
 
-    texto = "Estás llevando:\n";
- //   let seguir = confirm("Desea agregar otro producto?")
     
-    if(seguir === true){
-
-        procedimientoCompra();
-    
-    }else{
-        divProductos.innerHTML = "<h3>Tu pedido es:<br></h3>"
-        arrayCarrito.forEach(recorrerArray);
+    document.getElementById('mostrarCarrito').addEventListener('click', () =>{
+        divCarrito.innerHTML = ''
+        arrayCarrito.forEach(recorrerArray)
         total  = arrayCarrito.reduce((total, producto) => total + producto.subTotal, 0);
-        texto += `\nTotal: ${total}` 
-    //    alert(texto);       
-    }
+        divCarrito.innerHTML += `
+            <h3>TOTAL: ${total}</h3>    
+        `
+    })
+
+
 }
+
 
 function recorrerArray(producto){
-    texto +=  producto.cantidad + " " + producto.nombre + " Subtotal: " + producto.subTotal + "\n";
-    divProductos.innerHTML += `
-        <h4 class="card-title">${producto.nombre}</h4><br>
-        <p class="card-text">Precio Unitario: $${producto.precio}</p><br>
-        <p class="card-text">Cantidad: ${producto.cantidad} u</p><br>
-        <p class="card-text">Subtotal: $${producto.subTotal}</p><br><br>
-        `
+   
+    divCarrito.innerHTML += `
+    <div class="card" id="" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">${producto.nombre}</h5>
+            <p class="card-text">Precio Unitario: $${producto.precio}</p>
+            <p class="card-text">Cantidad: ${producto.cantidad} u</p>
+            <p class="card-text">Subtotal: $${producto.subTotal}</p>           
+            <button class="btn btn-danger" id="eliminar${producto.nombre}">Eliminar</button>
+        </div>
+    </div>
 
-}
-const confirmarCompra = () =>{
-
- //   let confirmar = confirm("Desea quitar algún producto de la lista?")
-    
-    if(confirmar){
-        console.log(arrayCarrito);
-        texto = "";
-        arrayCarrito.forEach(mostrarCarrito);
-        let idEliminar;
-        do{
-//            idEliminar = parseInt(prompt("Ingresá el número de producto que querés eliminar\n" + texto));
-            console.log(idEliminar)
-        }while(isNaN(idEliminar) || idEliminar < 0 || idEliminar >= arrayCarrito.length)
-        arrayCarrito = arrayCarrito.filter((producto,indice) => indice != idEliminar)
-        console.log(arrayCarrito)
-    }
-
-    informarCompra();
-}
-
-function mostrarCarrito(producto, indice){
-    texto += "Número: "+ indice + "\n " + producto.cantidad + " " + producto.nombre + " Subtotal: " + producto.subTotal + "\n"; 
-}
-
-const cobrarProductos = () =>{
-    let monto = 0;
-    
-    do{
-    //    monto = parseInt(prompt("Con cuanto abonás?"));
-    }while(isNaN(monto))
-    
-    if(monto > total){
-   //     alert("Tu vuelto es $"+(monto - total)+"\nGracias por tu compra!")
-    }else if(monto === total){
-     //   alert("Gracias por tu compra!")
-    }else{
-   //     alert("Te faltarían $"+(total-monto))
-    }   
+    `
 }
 
 
 const procedimientoCompra = () =>{
-    let rubroElegido = rubrosDisponibles();
-//    let productoElegido = productosDisponibles(rubroElegido);
-//    solicitarCantidad(productoElegido);
-//    informarCompra();
+    rubrosDisponibles();
+    informarCompra();
 
 }
 
 
 inicializar();
 procedimientoCompra();
-//confirmarCompra();
-//cobrarProductos();
